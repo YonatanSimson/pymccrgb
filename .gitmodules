@@ -1,0 +1,3 @@
+[submodule "pymcc"]
+	path = pymcc
+	url = git@github.com:YonatanSimson/pymcc.git

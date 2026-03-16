@@ -37,6 +37,8 @@ def make_sgd_pipeline(X_train, y_train, **kwargs):
         n_jobs: int
             The number of jobs to use in fitting the classifier
             (Default: -1, Use all cores)
+        random_state: int or None
+            Random state for RBFSampler and SGDClassifier (Default: None)
         Any other keyword argument to sklearn.linear_model.SGDClassifier
 
     Returns
@@ -51,10 +53,11 @@ def make_sgd_pipeline(X_train, y_train, **kwargs):
     alpha = kwargs.get("alpha", DEFAULT_PARAMETERS["alpha"])
     max_iter = kwargs.get("max_iter", DEFAULT_PARAMETERS["max_iter"])
     n_jobs = kwargs.get("n_jobs", DEFAULT_PARAMETERS["n_jobs"])
+    random_state = kwargs.get("random_state", None)
 
     estimators = [
-        ("rbf", RBFSampler(gamma=gamma, n_components=n_components)),
-        ("clf", SGDClassifier(alpha=alpha, n_jobs=n_jobs, max_iter=max_iter)),
+        ("rbf", RBFSampler(gamma=gamma, n_components=n_components, random_state=random_state)),
+        ("clf", SGDClassifier(alpha=alpha, n_jobs=n_jobs, max_iter=max_iter, random_state=random_state)),
     ]
     pipeline = Pipeline(estimators)
     pipeline.fit(X_train, y_train)

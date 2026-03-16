@@ -126,8 +126,8 @@ def read_las(filename, usecols=DEFAULT_COLUMN_NAMES, userows=None, nrows=None):
 
     json = '{"pipeline": ["' + filename + '"]}'
     pipeline = pdal.Pipeline(json)
-    pipeline.validate()
-    pipeline.loglevel = 0
+
+
     _ = pipeline.execute()
 
     out = pipeline.arrays[0]
@@ -167,8 +167,8 @@ def write_dem(data, filename, resolution=1, radius=None):
         + '"}]}'
     )
     pipeline = pdal.Pipeline(json)
-    pipeline.validate()
-    pipeline.loglevel = 0
+
+
     _ = pipeline.execute()
 
     os.remove("temp.las")
@@ -189,8 +189,8 @@ def write_pdal(arr, filename, writer, header=DEFAULT_HEADER):
         + '"}]}'
     )
     pipeline = pdal.Pipeline(json)
-    pipeline.validate()
-    pipeline.loglevel = 0
+
+
     _ = pipeline.execute()
 
     os.remove("temp.csv")

@@ -18,42 +18,77 @@ who want to classify point clouds for topographic analysis, canopy height measur
 
 ### Installation
 
-This package is developed for Linux and Python 3.6+. It depends on common 
-Python packages like sklearn, numpy, the LibLAS C API, and 
+This package is developed for Linux and Python 3.10+. It depends on common
+Python packages like sklearn, numpy, PDAL, the LibLAS C API, and
 [MCC Python bindings](https://github.com/stgl/pymcc).
 
-You can install it with `conda` or `virtualenv` in a virtual environment.
+#### 1. Install system dependencies (LibLAS, PDAL, and build tools)
+
+LibLAS is not available via apt on Ubuntu 22.04+, so it must be built from source:
 
 ```bash
-git clone https://github.com/rmsare/pymccrgb
+sudo apt update
+sudo apt install -y cmake g++ libgdal-dev libboost-all-dev \
+    libgeotiff-dev libtiff-dev
+
+git clone https://github.com/libLAS/libLAS.git
+cd libLAS
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+```
+
+PDAL must be built from source on Ubuntu 22.04+ to avoid a GDAL/PROJ version
+conflict. The apt and conda-forge packages link PDAL against `libgdal.so.30`
+(GDAL 3.4), which pulls in both `libproj.so.22` and `libproj.so.25`
+simultaneously, causing a segfault on startup.
+
+Use the provided install script, which pins the build to GDAL 3.8
+(`libgdal.so.34`) and PROJ 9 (`libproj.so.25`):
+
+```bash
+# From the pymcc repo root:
+sudo bash install_pdal_2.7.sh
+
+# Override defaults if needed:
+PDAL_VERSION=2.7.2 VENV=/path/to/venv sudo -E bash install_pdal_2.7.sh
+```
+
+The script will verify after installation that no conflicting libraries are
+linked, and will fail fast if the build is not clean.
+
+#### 2. Install pymccrgb in a virtual environment
+
+```bash
+git clone https://github.com/stgl/pymccrgb
 cd pymccrgb
-conda env create -f environment.yml
-conda activate pymcc
-pip install pymccrgb
+python -m venv venv
+source venv/bin/activate
+pip install scikit-build-core cython numpy
+pip install --no-build-isolation -e .
 py.test pymccrgb/tests
 ```
 
-*(Conda package coming soon)*
-
-<!---
-You can install it with `conda` or `pip`:
+#### Conda (alternative)
 
 ```bash
-conda env create -n pymcc
+git clone https://github.com/stgl/pymccrgb
+cd pymccrgb
+conda env create -f environment.yml
 conda activate pymcc
-conda install pymccrgb -c conda-forge
+pip install --no-build-isolation -e .
+py.test pymccrgb/tests
 ```
---->
 
 ### Requirements
 
-The LibLAS C library is required for MCC and `pymccrgb`. The MCC wrapper also 
-requires Boost and the C++11 or later standard library. These are installed 
-with the conda package.
+The LibLAS C library and PDAL are required for MCC and `pymccrgb`. The MCC
+wrapper also requires Boost and the C++11 or later standard library.
+Building from source requires `scikit-build-core`, `cython`, and `cmake`.
 
-Refer to the [documentation](https://pymccrgb.readthedocs.io/en/latest/installation.html)
-and the [LibLAS install guide](https://liblas.org/start.html#installation) for 
-instructions for installing LibLAS from source.
+See the [LibLAS install guide](https://liblas.org/start.html#installation) and
+[PDAL install guide](https://pdal.io/en/stable/download.html) for more details.
 
 ### Examples
 

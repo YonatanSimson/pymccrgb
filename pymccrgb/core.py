@@ -155,8 +155,7 @@ def mcc(
         )
 
     if use_las_codes:
-        labels[labels == 0] = 4  # Vegetation
-        labels[labels == 1] = 2  # Ground
+        labels = np.where(labels, 2, 4).astype(int)
 
     return data, labels
 
@@ -320,13 +319,13 @@ def mcc_rgb(
                     X_train, y_train = equal_sample(
                         X, y, size=int(n_train / 2), seed=seed
                     )
-                    pipeline = make_sgd_pipeline(X_train, y_train, **pipeline_kwargs)
+                    pipeline = make_sgd_pipeline(X_train, y_train, random_state=seed, **pipeline_kwargs)
 
                     if n_jobs > 1 or n_jobs == -1:
                         if verbose:
                             print(f"Predicting in parallel using {n_jobs}")
 
-                        from sklearn.externals.joblib import Parallel, delayed
+                        from joblib import Parallel, delayed
 
                         pool = Parallel(n_jobs=n_jobs)
                         wrapper = delayed(pipeline.predict)
@@ -382,7 +381,6 @@ def mcc_rgb(
         )
 
     if use_las_codes:
-        labels[labels == 0] = 4  # Vegetation
-        labels[labels == 1] = 2  # Ground
+        labels = np.where(labels, 2, 4).astype(int)
 
     return data, labels  # , updated
