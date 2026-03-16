@@ -31,6 +31,10 @@ dependencies = [
     "pymcc_lidar",
 ]
 
+[project.optional-dependencies]
+rasterio = ["rasterio"]  # fallback for write_dem when PDAL/GDAL is unavailable or fails
+vertical = ["pyproj"]    # for ellipsoidal -> vertical CRS height conversion in write_dem
+
 [project.urls]
 Homepage = "https://github.com/rmsare/pymccrgb"
 

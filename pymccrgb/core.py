@@ -277,11 +277,29 @@ def mcc_rgb(
 
     original_data = copy(data)
 
-    # Mask NaN and infinite index/color values
+    # Mask NaN and infinite index/color values (e.g. NGRDVI is NaN when R+G=0)
     X = calculate_color_features(data)
     mask = np.isfinite(X).all(axis=-1)
     data = data[mask, :]
     n_points = data.shape[0]
+    if n_points == 0:
+        # No valid color features: if RGB is all zero, use XYZ-only MCC
+        if original_data.shape[1] >= 6 and np.all(original_data[:, 3:6] == 0):
+            print(
+                "All RGB are (0,0,0); using MCC (XYZ-only) instead of MCC-RGB."
+            )
+            return mcc(
+                original_data,
+                scales=scales,
+                tols=tols,
+                threshs=threshs,
+                use_las_codes=use_las_codes,
+                verbose=verbose,
+            )
+        raise ValueError(
+            "All points were dropped: color features have NaN/Inf (e.g. RGB all zero "
+            "gives NGRDVI=NaN). Use mcc() for XYZ-only data, or ensure RGB is valid."
+        )
     # updated = np.full((n_points,), fill_value=-1)
     reached_max_iter = False
 
