@@ -7,12 +7,10 @@ from scipy.spatial import cKDTree
 
 def intersect_rows(arr1, arr2):
     """ Returns a binary mask of the rows in arr1 that are in arr2 """
-    mask = np.zeros((arr2.shape[0],), dtype=bool)
-    dict1 = {tuple(row): i for i, row in enumerate(arr1)}
-    for i, row in enumerate(arr2):
-        if tuple(row) in dict1:
-            mask[i] = True
-    return mask
+    dt = np.dtype((np.void, arr1.dtype.itemsize * arr1.shape[1]))
+    a1 = np.ascontiguousarray(arr1).view(dt).ravel()
+    a2 = np.ascontiguousarray(arr2).view(dt).ravel()
+    return np.in1d(a2, a1)
 
 
 def point_grid(x_min, x_max, y_min, y_max, dx, dy=None):
