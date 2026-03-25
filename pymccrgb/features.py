@@ -53,7 +53,8 @@ def calculate_ngrdvi(data):
     red = rgb[:, 0].reshape(-1, 1)
     green = rgb[:, 1].reshape(-1, 1)
 
-    denom = (green + red).astype(float)
+    denom = green.astype(int) + red.astype(int)
+    denom = denom.astype(float)
     denom[denom == 0] = np.nan
     return (green - red) / denom
 
@@ -77,4 +78,9 @@ def calculate_vdvi(data):
     green = rgb[:, 1].reshape(-1, 1)
     blue = rgb[:, 2].reshape(-1, 1)
 
-    return (2 * green - red - blue) / (2 * green + red + blue)
+    red = red.astype(int)
+    green = green.astype(int)
+    blue = blue.astype(int)
+    denom = (2 * green + red + blue).astype(float)
+    denom[denom == 0] = np.nan
+    return (2 * green - red - blue) / denom
