@@ -352,7 +352,7 @@ def _write_dem_rasterio(data, filename, resolution=1, srs=None, vertical_crs=Non
     count = np.bincount(lin, minlength=n_cells)
     mean_z = np.where(
         count > 0,
-        sum_z / count,
+        np.divide(sum_z, count, where=count > 0, out=np.full_like(sum_z, NODATA_DEM)),
         NODATA_DEM,
     )
     grid = mean_z.astype(np.float32).reshape(height, width)
